@@ -1,0 +1,880 @@
+<style>
+/* ============================================================
+   SEGMENT 1 / 8 — THEME TOKENS & CSS VARIABLES
+   (Colors, spacing tokens. Change palette ONLY here.)
+   ============================================================ */
+:root {
+    --ts-bg-main: #0a0e27;
+    --ts-card-bg: rgba(255, 255, 255, 0.03);
+    --ts-card-border: rgba(255, 255, 255, 0.08);
+    --ts-card-hover-border: rgba(0, 217, 255, 0.4);
+    --ts-accent-cyan: #00d9ff;
+    --ts-accent-purple: #8b5cf6;
+    --ts-text-primary: #f5f5f5;
+    --ts-text-muted: #a1a1aa;
+    --ts-error-bg: rgba(220, 38, 38, 0.1);
+    --ts-error-border: rgba(220, 38, 38, 0.3);
+    --ts-error-text: #f87171;
+}
+
+/* ============================================================
+   SEGMENT 2 / 8 — LAYOUT & PAGE STRUCTURE STYLES
+   (Full-bleed wrapper trick — DO NOT modify this technique,
+   the host page requires it to render edge-to-edge correctly.)
+   ============================================================ */
+.ts-master-wrapper {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    background: var(--ts-bg-main);
+    color: var(--ts-text-primary);
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+    box-sizing: border-box;
+    line-height: 1.6;
+    padding-bottom: 4rem;
+}
+.ts-master-wrapper * { box-sizing: border-box; }
+
+.ts-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Hero banner */
+.ts-hero {
+    text-align: center;
+    padding: 3rem 1.5rem 2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: radial-gradient(circle at top, rgba(139, 92, 246, 0.1) 0%, transparent 60%);
+}
+.ts-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    margin: 0 0 0.8rem 0;
+    color: #fff;
+    font-weight: 700;
+}
+.ts-hero p {
+    font-size: 1.05rem;
+    color: var(--ts-text-muted);
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+/* Dashboard output surface (holds workspace cards) */
+.ts-output { margin-top: 1.5rem; }
+.ts-workspace { display: flex; flex-direction: column; gap: 1.25rem; }
+
+/* Loading state */
+.ts-loading-row {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 2rem; font-size: 15px; color: var(--ts-accent-cyan);
+    background: rgba(0,0,0,0.2); border-radius: 12px;
+    border: 1px dashed rgba(0,217,255,0.3);
+}
+.ts-spinner {
+    width: 24px; height: 24px;
+    border: 3px solid rgba(0,217,255,0.2);
+    border-top-color: var(--ts-accent-cyan);
+    border-radius: 50%;
+    animation: ts-spin 0.8s linear infinite;
+}
+@keyframes ts-spin { to { transform: rotate(360deg); } }
+
+/* Alert states */
+.ts-alert { padding: 16px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; display: block; margin-bottom: 1rem; }
+.ts-alert-err { background: var(--ts-error-bg); color: var(--ts-error-text); border: 1px solid var(--ts-error-border); }
+.ts-alert-warn { background: rgba(234,179,8,0.1); color: #facc15; border: 1px solid rgba(234,179,8,0.3); }
+.ts-alert-info { background: rgba(0, 217, 255, 0.08); color: var(--ts-accent-cyan); border: 1px solid rgba(0,217,255,0.25); }
+
+.ts-login-link { display: inline-block; margin-top: 10px; padding: 8px 20px; background: var(--ts-accent-cyan); color: #0a0e27; border-radius: 7px; font-size: 13px; font-weight: 700; text-decoration: none; }
+.ts-recharge-link { display: inline-block; margin-top: 10px; padding: 8px 20px; background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple)); color: #fff; border-radius: 7px; font-size: 13px; font-weight: 700; text-decoration: none; }
+.ts-diag-pre { font-family: 'Fira Mono', monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all; color: var(--ts-error-text); margin: 0; max-height: 340px; overflow-y: auto; }
+
+/* ============================================================
+   SEGMENT 3 / 8 — CONTROL PANEL STYLES
+   (Segmented mode tabs replacing the old <select> dropdown,
+   URL input, and primary action button.)
+   ============================================================ */
+.ts-control-panel {
+    background: var(--ts-card-bg);
+    border: 1px solid var(--ts-card-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Premium pill-style segmented tabs (replaces dropdown) */
+.ts-mode-tabs {
+    display: flex;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 5px;
+    margin-bottom: 12px;
+}
+.ts-mode-tab {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--ts-text-muted);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.ts-mode-tab:hover:not(.ts-mode-tab-active) { color: var(--ts-text-primary); }
+.ts-mode-tab-active {
+    background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(0,217,255,0.25);
+}
+
+.ts-input-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+@media (min-width: 768px) {
+    .ts-input-row { flex-direction: row; align-items: stretch; }
+}
+
+.ts-input {
+    flex: 1;
+    padding: 16px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    font-size: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--ts-text-primary);
+    outline: none;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+.ts-input:focus { border-color: var(--ts-accent-cyan); box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.15); }
+
+.ts-btn {
+    padding: 16px 32px;
+    background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple));
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    white-space: nowrap;
+}
+.ts-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.ts-btn:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.9; }
+
+/* ============================================================
+   SEGMENT 4 / 8 — DASHBOARD DATA CARD STYLES
+   (Video profile card, KPI tiles, description, tags.)
+   ============================================================ */
+.ts-card {
+    background: var(--ts-card-bg);
+    border: 1px solid var(--ts-card-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+}
+.ts-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.ts-card-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ts-accent-purple);
+    letter-spacing: 1.5px;
+    margin: 0;
+}
+.ts-btn-copy {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--ts-accent-cyan);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+.ts-btn-copy:hover { background: var(--ts-accent-cyan); color: #0a0e27; }
+
+/* "Profile" style header card: thumbnail + title + channel together,
+   dashboard-esque instead of a plain stacked layout. */
+.ts-profile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+@media (min-width: 640px) {
+    .ts-profile-card { flex-direction: row; align-items: center; }
+}
+.ts-embed-container {
+    width: 100%; aspect-ratio: 16 / 9;
+    border-radius: 10px; overflow: hidden;
+    background: #000; border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+@media (min-width: 640px) {
+    .ts-embed-container { width: 200px; aspect-ratio: 16/9; }
+}
+.ts-embed-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.ts-profile-meta { flex: 1; min-width: 0; }
+.ts-meta-title { font-size: 1.2rem; font-weight: 700; line-height: 1.4; color: #fff; margin-bottom: 0.4rem; }
+.ts-meta-channel {
+    display: inline-block;
+    font-size: 0.85rem; font-weight: 700; color: var(--ts-accent-cyan);
+    background: rgba(0,217,255,0.08); border: 1px solid rgba(0,217,255,0.2);
+    padding: 4px 12px; border-radius: 20px;
+}
+
+.ts-desc-box {
+    font-size: 0.95rem; line-height: 1.6; color: var(--ts-text-muted);
+    white-space: pre-wrap; max-height: 250px; overflow-y: auto;
+    background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.ts-desc-box::-webkit-scrollbar { width: 6px; }
+.ts-desc-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+.ts-desc-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+/* KPI tiles (dashboard-style stat blocks with icons) */
+.ts-stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+}
+.ts-stat-block {
+    background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px; padding: 1rem 0.5rem; text-align: center;
+    transition: border-color 0.2s ease;
+}
+.ts-stat-block:hover { border-color: var(--ts-card-hover-border); }
+.ts-stat-icon { font-size: 1.1rem; display: block; margin-bottom: 4px; }
+.ts-stat-val { font-size: 1.25rem; font-weight: 800; color: #fff; display: block; margin-bottom: 0.2rem; }
+.ts-stat-lbl { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--ts-text-muted); letter-spacing: 1px; }
+
+.ts-tag-cluster { display: flex; flex-wrap: wrap; gap: 8px; }
+.ts-tag-node {
+    font-size: 0.85rem; font-weight: 600; padding: 6px 14px;
+    background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #c084fc; border-radius: 20px; word-break: break-word;
+}
+
+/* ============================================================
+   SEGMENT 5 / 8 — TIMELINE TOGGLE & COMPARISON DASHBOARD STYLES
+   (Before/After switch + Compare growth visualization.)
+   ============================================================ */
+.ts-timeline-row { display: flex; gap: 10px; margin-bottom: 1rem; }
+.ts-toggle-btn {
+    flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--ts-card-border);
+    color: var(--ts-text-muted); transition: all 0.2s ease;
+}
+.ts-toggle-btn.ts-toggle-active {
+    background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple));
+    color: #fff; border-color: transparent;
+}
+.ts-toggle-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* Small badge shown when a panel is served instantly from local cache */
+.ts-cache-flag {
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    color: var(--ts-text-muted); letter-spacing: 0.5px; margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 5px;
+}
+.ts-cache-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block; }
+
+.ts-snapshot-date { font-size: 0.8rem; color: var(--ts-text-muted); margin-bottom: 1rem; }
+
+/* Comparison growth dashboard */
+.ts-delta-row {
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.ts-delta-row:last-child { border-bottom: none; }
+.ts-delta-top {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+}
+.ts-delta-label { font-size: 0.85rem; color: var(--ts-text-muted); font-weight: 600; }
+.ts-delta-vals { font-size: 0.9rem; color: #fff; font-weight: 700; }
+.ts-delta-pct { font-size: 0.85rem; font-weight: 800; margin-left: 8px; }
+.ts-delta-up { color: #4ade80; }
+.ts-delta-down { color: #f87171; }
+.ts-delta-flat { color: var(--ts-text-muted); }
+.ts-delta-bar-track {
+    width: 100%; height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;
+}
+.ts-delta-bar-fill {
+    height: 100%; border-radius: 4px; transition: width 0.4s ease;
+}
+.ts-delta-bar-up { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.ts-delta-bar-down { background: linear-gradient(90deg, #f87171, #dc2626); }
+.ts-delta-bar-flat { background: rgba(255,255,255,0.15); }
+</style>
+
+<!-- ============================================================
+     SEGMENT 6 / 8 — DASHBOARD MARKUP
+     (Structure only. Wrapper class must stay exactly as-is.)
+     ============================================================ -->
+<div class="ts-master-wrapper">
+  <div class="ts-hero">
+      <h1>Video <span style="color: #00d9ff;">Analysis</span></h1>
+      <p>Analyze specific competitor videos, track their views growth, and extract internal video performance data instantly.</p>
+  </div>
+
+  <div class="ts-container">
+
+    <!-- Control panel: mode tabs + URL input + primary action -->
+    <div class="ts-control-panel">
+      <div class="ts-mode-tabs" role="tablist" aria-label="Analysis mode">
+        <button type="button" class="ts-mode-tab ts-mode-tab-active" data-mode="analyze" role="tab" aria-selected="true" onclick="vmtSetMode('analyze')">Analyze</button>
+        <button type="button" class="ts-mode-tab" data-mode="compare" role="tab" aria-selected="false" onclick="vmtSetMode('compare')">Compare</button>
+      </div>
+      <div class="ts-input-row">
+        <input type="url" id="vmt-url" class="ts-input" placeholder="https://www.youtube.com/watch?v=..." spellcheck="false" autocomplete="off" />
+        <button id="vmt-btn" class="ts-btn" onclick="vmtHandlePrimaryAction()">Analyze</button>
+      </div>
+    </div>
+
+    <!-- Dashboard output surface -->
+    <div id="vmt-out" class="ts-output"></div>
+
+  </div>
+</div>
+
+<script>
+/* Global copy-to-clipboard helper, used by inline onclick handlers in cards */
+window.tsCopyTextData = function(btn, targetId) {
+    const txt = document.getElementById(targetId).innerText;
+    navigator.clipboard.writeText(txt).then(() => {
+        const og = btn.innerText;
+        btn.innerText = 'Copied!';
+        setTimeout(() => btn.innerText = og, 1500);
+    });
+};
+
+(function() {
+
+  // ============================================================
+  // SEGMENT 7 / 8 — CORE STATE, HELPERS & RENDER FUNCTIONS
+  // (Non-network logic: formatting, DOM helpers, markup builders,
+  // and the in-memory cache that stops duplicate API calls.)
+  // ============================================================
+
+  const DEBUG_MODE = false;
+  const API_ENDPOINT = 'https://www.techstora.com/api/v1/youtube/proxy';
+  const BEFORE_ENDPOINT = 'https://www.techstora.com/api/v1/youtube/before';
+  const COMPARE_ENDPOINT = 'https://www.techstora.com/api/v1/youtube/compare';
+  const RECHARGE_URL = 'https://www.techstora.com/my-wallet';
+
+  // --- Session state ---
+  let currentUrl = null;
+  let activeView = 'after';   // 'after' | 'before'
+  let currentMode = 'analyze'; // 'analyze' | 'compare'
+
+  // --- In-memory cache: prevents re-hitting the server when the user
+  //     flips Before/After repeatedly on the SAME video. Cleared only
+  //     when a genuinely new "Analyze" submission happens. ---
+  let afterCache = null;    // { vidId, sn, st, tags }
+  let beforeCache = null;   // { vidId, sn, st, tags, captured_at }
+  let cachedForUrl = null;  // which url the above caches belong to
+
+  function getUID() {
+    try {
+      const scripts = document.getElementsByTagName('script');
+      for (let s of scripts) {
+        const t = s.innerHTML || s.textContent || '';
+        if (t.includes('__session_info__') && t.includes('"uid"')) {
+          const m = t.match(/"uid"\s*:\s*(\d+)/);
+          if (m && m[1]) return m[1];
+        }
+      }
+    } catch(e) {}
+    return 'unknown_uid';
+  }
+
+  function fmtNum(n) {
+    if (n == null) return '—';
+    const x = Number(n);
+    if (x >= 1e9) return (x / 1e9).toFixed(1) + 'B';
+    if (x >= 1e6) return (x / 1e6).toFixed(1) + 'M';
+    if (x >= 1e3) return (x / 1e3).toFixed(1) + 'K';
+    return x.toLocaleString();
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    try { return new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch(e) { return ''; }
+  }
+
+  function extractYouTubeId(url) {
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+    return (match && match[1]) ? match[1] : null;
+  }
+
+  function setOut(html) {
+    document.getElementById('vmt-out').innerHTML = html;
+  }
+
+  function setBtn(loading, label) {
+    const b = document.getElementById('vmt-btn');
+    b.disabled = loading;
+    b.textContent = loading ? 'Working...' : (label || 'Analyze');
+  }
+
+  function currentModeLabel() {
+    return currentMode === 'compare' ? 'Compare' : 'Analyze';
+  }
+
+  // Mode tab switcher (replaces the old <select> dropdown entirely)
+  window.vmtSetMode = function(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.ts-mode-tab').forEach(btn => {
+      const isActive = btn.dataset.mode === mode;
+      btn.classList.toggle('ts-mode-tab-active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    const b = document.getElementById('vmt-btn');
+    if (b && !b.disabled) b.textContent = currentModeLabel();
+  };
+
+  function thumbUrl(sn, vidId) {
+    const t = sn?.thumbnails || {};
+    return t.maxres?.url || t.high?.url || t.medium?.url || t.default?.url || `https://i.ytimg.com/vi/${vidId}/hqdefault.jpg`;
+  }
+
+  function pctClass(pct) {
+    if (pct == null) return 'ts-delta-flat';
+    if (pct > 0) return 'ts-delta-up';
+    if (pct < 0) return 'ts-delta-down';
+    return 'ts-delta-flat';
+  }
+
+  function pctLabel(pct) {
+    if (pct == null) return '—';
+    const sign = pct > 0 ? '+' : '';
+    return `${sign}${pct}%`;
+  }
+
+  // Bar width for the comparison visualization, capped at 100%
+  function pctBarWidth(pct) {
+    if (pct == null) return 0;
+    return Math.min(100, Math.abs(pct));
+  }
+
+  function pctBarClass(pct) {
+    if (pct == null) return 'ts-delta-bar-flat';
+    if (pct > 0) return 'ts-delta-bar-up';
+    if (pct < 0) return 'ts-delta-bar-down';
+    return 'ts-delta-bar-flat';
+  }
+
+  function renderMetaCard(vidId, sn, st, tags) {
+    const tagsHtml = tags.length
+      ? `<div class="ts-tag-cluster">${tags.map(t => `<span class="ts-tag-node">${t}</span>`).join('')}</div>`
+      : `<span style="font-size: 0.9rem; color: rgba(255,255,255,0.4); font-style: italic;">[NO_TAGS_DETECTED]</span>`;
+
+    return `
+      <div class="ts-card ts-profile-card">
+          <div class="ts-embed-container">
+              <img src="${thumbUrl(sn, vidId)}" alt="${(sn.title || 'Video thumbnail').replace(/"/g,'')}" />
+          </div>
+          <div class="ts-profile-meta">
+              <div id="ts-val-title" class="ts-meta-title">${sn.title || '—'}</div>
+              <span class="ts-meta-channel">${sn.channelTitle || '—'}</span>
+          </div>
+      </div>
+
+      <div class="ts-card">
+          <div class="ts-card-header">
+              <div class="ts-card-title">Performance Telemetry</div>
+          </div>
+          <div class="ts-stats-grid">
+              <div class="ts-stat-block">
+                  <span class="ts-stat-icon">👁</span>
+                  <span class="ts-stat-val">${fmtNum(st.viewCount)}</span>
+                  <span class="ts-stat-lbl">Views</span>
+              </div>
+              <div class="ts-stat-block">
+                  <span class="ts-stat-icon">❤</span>
+                  <span class="ts-stat-val">${fmtNum(st.likeCount)}</span>
+                  <span class="ts-stat-lbl">Likes</span>
+              </div>
+              <div class="ts-stat-block">
+                  <span class="ts-stat-icon">💬</span>
+                  <span class="ts-stat-val">${fmtNum(st.commentCount)}</span>
+                  <span class="ts-stat-lbl">Comments</span>
+              </div>
+          </div>
+      </div>
+
+      <div class="ts-card">
+          <div class="ts-card-header">
+              <div class="ts-card-title">Content Matrix</div>
+              <button class="ts-btn-copy" onclick="tsCopyTextData(this, 'ts-val-desc')">Copy Desc</button>
+          </div>
+          <div id="ts-val-desc" class="ts-desc-box">${sn.description || 'No descriptive data mapped.'}</div>
+      </div>
+
+      <div class="ts-card">
+          <div class="ts-card-header">
+              <div class="ts-card-title">Optimization Vectors</div>
+              <button class="ts-btn-copy" onclick="tsCopyTextData(this, 'ts-val-tags-raw')">Copy All Tags</button>
+          </div>
+          <div id="ts-val-tags-raw" style="display:none;">${tags.join(', ')}</div>
+          ${tagsHtml}
+      </div>
+    `;
+  }
+
+  function renderTimelineRow(vidId) {
+    const afterActive = activeView === 'after' ? 'ts-toggle-active' : '';
+    const beforeActive = activeView === 'before' ? 'ts-toggle-active' : '';
+    return `
+      <div class="ts-timeline-row">
+        <button class="ts-toggle-btn ${afterActive}" onclick="vmtShowAfter()">After (Latest)</button>
+        <button class="ts-toggle-btn ${beforeActive}" onclick="vmtShowBefore('${vidId}')">Before (Previous Snapshot)</button>
+      </div>
+    `;
+  }
+
+  function renderAuthRequired() {
+    return `<div class="ts-alert ts-alert-warn">Authorization required to access pipeline.</div><a class="ts-login-link" href="/web/login">Log In</a>`;
+  }
+
+  function renderQuotaExhausted(msg) {
+    return `<div class="ts-alert ts-alert-warn">🛑 ${msg}</div><a class="ts-recharge-link" href="${RECHARGE_URL}">Recharge Now</a>`;
+  }
+
+  // Small "served instantly" badge shown when a panel is painted from
+  // local cache instead of hitting the server — useful for debugging too.
+  function cacheFlagHtml() {
+    return `<div class="ts-cache-flag"><span class="ts-cache-dot"></span>Loaded instantly from this session (no server call)</div>`;
+  }
+
+
+  // ============================================================
+  // SEGMENT 8 / 8 — API HANDLERS (Analyze / Before / Compare)
+  // (All network calls live here. Cache is checked FIRST in
+  // vmtShowAfter/vmtShowBefore before any fetch is attempted.)
+  // ============================================================
+
+  window.vmtHandlePrimaryAction = function() {
+    if (currentMode === 'compare') {
+      vmtRunCompareFlow();
+    } else {
+      vmtRun(true); // true = this is a fresh user-triggered submission
+    }
+  };
+
+  // forceRefresh = true  -> always hits the server (used on manual Analyze submit)
+  // forceRefresh = false -> serves from afterCache if available (used by vmtShowAfter fallback)
+  window.vmtRun = async function(forceRefresh) {
+    const url = document.getElementById('vmt-url').value.trim();
+    const vidId = extractYouTubeId(url);
+
+    if (!vidId) {
+      setOut(`<div class="ts-alert ts-alert-err"><strong>Validation Error:</strong> Enter a valid YouTube video URL format.</div>`);
+      return;
+    }
+
+    // A fresh "Analyze" submission always invalidates old cached snapshots,
+    // since the user may be pointing at a different video (or wants a true refresh).
+    if (forceRefresh) {
+      afterCache = null;
+      beforeCache = null;
+      cachedForUrl = null;
+    }
+
+    currentUrl = url;
+    activeView = 'after';
+
+    setBtn(true);
+    setOut(`<div class="ts-loading-row"><div class="ts-spinner"></div><span>Querying API Pipeline...</span></div>`);
+
+    const payload = { tool_type: 'video_meta_tags', target_url: url, uid: getUID() };
+
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      const raw = await res.text();
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          let msg = 'Usage limit reached.';
+          try { msg = JSON.parse(raw).error || msg; } catch(e) {}
+          setBtn(false, currentModeLabel());
+          setOut(renderQuotaExhausted(msg));
+          return;
+        }
+        if (res.status === 401) {
+          setBtn(false, currentModeLabel());
+          setOut(renderAuthRequired());
+          return;
+        }
+        throw new Error(`HTTP_${res.status} | ${raw.substring(0, 800)}`);
+      }
+
+      let data;
+      try { data = JSON.parse(raw); } catch(e) { throw new Error(`JSON_PARSE_FAILED | ${raw.substring(0, 800)}`); }
+
+      const json = data.youtube_raw_json;
+      if (!json || !json.items || json.items.length === 0) {
+        setBtn(false, currentModeLabel());
+        setOut(`<div class="ts-alert ts-alert-err"><strong>Target Offline:</strong> Video not found or restrictions applied by creator.</div>`);
+        return;
+      }
+
+      const item = json.items[0];
+      const sn = item.snippet || {};
+      const st = item.statistics || {};
+      const tags = sn.tags || [];
+
+      // Cache this result so flipping back to "After" later costs zero API calls.
+      afterCache = { vidId, sn, st, tags };
+      cachedForUrl = url;
+
+      setBtn(false, currentModeLabel());
+      setOut(`
+        <div class="ts-workspace">
+          ${renderTimelineRow(vidId)}
+          <div id="vmt-panel">${renderMetaCard(vidId, sn, st, tags)}</div>
+        </div>
+      `);
+
+    } catch(err) {
+      setBtn(false, currentModeLabel());
+      if (DEBUG_MODE) {
+        const dump = JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+        setOut(`<div class="ts-alert ts-alert-err"><strong>RAW FAULT:</strong><hr style="border-color:rgba(200,0,0,0.2);margin:8px 0;"><pre class="ts-diag-pre">${dump}</pre></div>`);
+      } else {
+        setOut(`<div class="ts-alert ts-alert-err">Pipeline compromised. Check server stability and try again.</div>`);
+      }
+    }
+  };
+
+  // "After" toggle — cache-first. Only calls vmtRun (a real fetch) on a genuine cache miss.
+  window.vmtShowAfter = function() {
+    if (!currentUrl) return;
+    const vidId = extractYouTubeId(currentUrl);
+    activeView = 'after';
+
+    if (cachedForUrl === currentUrl && afterCache) {
+      const timelineRow = document.querySelector('.ts-timeline-row');
+      const panel = document.getElementById('vmt-panel');
+      if (timelineRow) timelineRow.outerHTML = renderTimelineRow(vidId);
+      if (panel) {
+        panel.innerHTML = cacheFlagHtml() + renderMetaCard(afterCache.vidId, afterCache.sn, afterCache.st, afterCache.tags);
+      }
+      return; // <-- no network call
+    }
+
+    // Cache miss (shouldn't normally happen, but fall back safely)
+    vmtRun(false);
+  };
+
+  // "Before" toggle — cache-first. Fetches BEFORE_ENDPOINT only once per video.
+  window.vmtShowBefore = async function(vidId) {
+    if (!currentUrl) return;
+    activeView = 'before';
+
+    const timelineRow = document.querySelector('.ts-timeline-row');
+    const panel = document.getElementById('vmt-panel');
+    if (timelineRow) timelineRow.outerHTML = renderTimelineRow(vidId);
+
+    if (cachedForUrl === currentUrl && beforeCache) {
+      if (panel) {
+        panel.innerHTML = cacheFlagHtml() + `
+          <div class="ts-snapshot-date">📅 Captured: ${fmtDate(beforeCache.captured_at)}</div>
+          ${renderMetaCard(beforeCache.vidId, beforeCache.sn, beforeCache.st, beforeCache.tags)}
+        `;
+      }
+      return; // <-- no network call
+    }
+
+    if (panel) {
+      panel.innerHTML = `<div class="ts-loading-row"><div class="ts-spinner"></div><span>Fetching previous snapshot...</span></div>`;
+    }
+
+    const payload = { tool_type: 'video_meta_tags', target_url: currentUrl, uid: getUID() };
+
+    try {
+      const res = await fetch(BEFORE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      const raw = await res.text();
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          let msg = 'Usage limit reached.';
+          try { msg = JSON.parse(raw).error || msg; } catch(e) {}
+          document.getElementById('vmt-panel').innerHTML = renderQuotaExhausted(msg);
+          return;
+        }
+        if (res.status === 401) {
+          document.getElementById('vmt-panel').innerHTML = renderAuthRequired();
+          return;
+        }
+        throw new Error(`HTTP_${res.status} | ${raw.substring(0, 800)}`);
+      }
+
+      let data;
+      try { data = JSON.parse(raw); } catch(e) { throw new Error(`JSON_PARSE_FAILED | ${raw.substring(0, 800)}`); }
+
+      if (data.status === 'not_indexed' || data.status === 'first_index_today') {
+        document.getElementById('vmt-panel').innerHTML = `<div class="ts-alert ts-alert-info">${data.message}</div>`;
+        return;
+      }
+
+      const json = data.youtube_raw_json;
+      const item = json?.items?.[0];
+      if (!item) {
+        document.getElementById('vmt-panel').innerHTML = `<div class="ts-alert ts-alert-err">Previous snapshot could not be loaded.</div>`;
+        return;
+      }
+
+      const sn = item.snippet || {};
+      const st = item.statistics || {};
+      const tags = sn.tags || [];
+
+      // Cache this snapshot so re-toggling to "Before" costs zero API calls.
+      beforeCache = { vidId, sn, st, tags, captured_at: data.captured_at };
+      cachedForUrl = currentUrl;
+
+      document.getElementById('vmt-panel').innerHTML = `
+        <div class="ts-snapshot-date">📅 Captured: ${fmtDate(data.captured_at)}</div>
+        ${renderMetaCard(vidId, sn, st, tags)}
+      `;
+
+    } catch(err) {
+      const panel = document.getElementById('vmt-panel');
+      if (panel) {
+        if (DEBUG_MODE) {
+          const dump = JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+          panel.innerHTML = `<div class="ts-alert ts-alert-err"><strong>RAW FAULT:</strong><hr style="border-color:rgba(200,0,0,0.2);margin:8px 0;"><pre class="ts-diag-pre">${dump}</pre></div>`;
+        } else {
+          panel.innerHTML = `<div class="ts-alert ts-alert-err">Pipeline compromised. Check server stability and try again.</div>`;
+        }
+      }
+    }
+  };
+
+  // Compare flow — unchanged trigger semantics, always a deliberate fresh request.
+  window.vmtRunCompareFlow = async function() {
+    const url = document.getElementById('vmt-url').value.trim();
+    const vidId = extractYouTubeId(url);
+
+    if (!vidId) {
+      setOut(`<div class="ts-alert ts-alert-err"><strong>Validation Error:</strong> Enter a valid YouTube video URL format.</div>`);
+      return;
+    }
+
+    currentUrl = url;
+
+    setBtn(true, 'Compare');
+    setOut(`<div class="ts-loading-row"><div class="ts-spinner"></div><span>Calculating comparison...</span></div>`);
+
+    const payload = { tool_type: 'video_meta_tags', target_url: url, uid: getUID() };
+
+    try {
+      const res = await fetch(COMPARE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      const raw = await res.text();
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          let msg = 'Usage limit reached.';
+          try { msg = JSON.parse(raw).error || msg; } catch(e) {}
+          setBtn(false, 'Compare');
+          setOut(renderQuotaExhausted(msg));
+          return;
+        }
+        if (res.status === 401) {
+          setBtn(false, 'Compare');
+          setOut(renderAuthRequired());
+          return;
+        }
+        throw new Error(`HTTP_${res.status} | ${raw.substring(0, 800)}`);
+      }
+
+      let data;
+      try { data = JSON.parse(raw); } catch(e) { throw new Error(`JSON_PARSE_FAILED | ${raw.substring(0, 800)}`); }
+
+      setBtn(false, 'Compare');
+
+      if (data.status !== 'ok') {
+        setOut(`<div class="ts-alert ts-alert-info">${data.message || 'Comparison not available yet.'}</div>`);
+        return;
+      }
+
+      const m = data.comparison?.metrics || {};
+      const rows = ['viewCount', 'likeCount', 'commentCount']
+        .filter(k => m[k])
+        .map(k => {
+          const label = k === 'viewCount' ? 'Views' : k === 'likeCount' ? 'Likes' : 'Comments';
+          const pct = m[k].percent_change;
+          return `
+            <div class="ts-delta-row">
+              <div class="ts-delta-top">
+                <span class="ts-delta-label">${label}</span>
+                <span class="ts-delta-vals">${fmtNum(m[k].before)} → ${fmtNum(m[k].after)}
+                  <span class="ts-delta-pct ${pctClass(pct)}">${pctLabel(pct)}</span>
+                </span>
+              </div>
+              <div class="ts-delta-bar-track">
+                <div class="ts-delta-bar-fill ${pctBarClass(pct)}" style="width:${pctBarWidth(pct)}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      setOut(`
+        <div class="ts-card">
+            <div class="ts-card-header">
+                <div class="ts-card-title">Growth Comparison (${data.days_between} days apart)</div>
+            </div>
+            ${rows}
+        </div>
+      `);
+
+    } catch(err) {
+      setBtn(false, 'Compare');
+      if (DEBUG_MODE) {
+        const dump = JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+        setOut(`<div class="ts-alert ts-alert-err"><strong>RAW FAULT:</strong><hr style="border-color:rgba(200,0,0,0.2);margin:8px 0;"><pre class="ts-diag-pre">${dump}</pre></div>`);
+      } else {
+        setOut(`<div class="ts-alert ts-alert-err">Pipeline compromised. Check server stability and try again.</div>`);
+      }
+    }
+  };
+
+})();
+</script>
