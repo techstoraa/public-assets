@@ -1,0 +1,728 @@
+<style>
+/* ============================================================
+   SEGMENT 1 / 8 — THEME TOKENS & CSS VARIABLES
+   (Colors, spacing tokens. Strictly controlled palette.)
+   ============================================================ */
+:root {
+    --ts-bg-main: #0a0e27;
+    --ts-card-bg: rgba(255, 255, 255, 0.03);
+    --ts-card-border: rgba(255, 255, 255, 0.08);
+    --ts-card-hover-border: rgba(0, 217, 255, 0.4);
+    --ts-accent-cyan: #00d9ff;
+    --ts-accent-purple: #8b5cf6;
+    --ts-text-primary: #f5f5f5;
+    --ts-text-muted: #a1a1aa;
+    --ts-error-bg: rgba(220, 38, 38, 0.1);
+    --ts-error-border: rgba(220, 38, 38, 0.3);
+    --ts-error-text: #f87171;
+    --ts-success-text: #4ade80;
+}
+
+/* ============================================================
+   SEGMENT 2 / 8 — LAYOUT & PAGE STRUCTURE STYLES
+   (Full-bleed wrapper trick - CRUCIAL for DOM Injection.)
+   ============================================================ */
+.ts-master-wrapper {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    background: var(--ts-bg-main);
+    color: var(--ts-text-primary);
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+    box-sizing: border-box;
+    line-height: 1.6;
+    padding-bottom: 4rem;
+}
+.ts-master-wrapper * { box-sizing: border-box; }
+
+.ts-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.ts-hero {
+    text-align: center;
+    padding: 3rem 1.5rem 2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: radial-gradient(circle at top, rgba(139, 92, 246, 0.1) 0%, transparent 60%);
+}
+.ts-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 0 0 0.8rem 0; color: #fff; font-weight: 700; }
+.ts-hero p { font-size: 1.05rem; color: var(--ts-text-muted); max-width: 680px; margin: 0 auto; }
+
+.ts-output { margin-top: 1.5rem; }
+.ts-workspace { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.ts-loading-row {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 2rem; font-size: 15px; color: var(--ts-accent-cyan);
+    background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed rgba(0,217,255,0.3);
+}
+.ts-spinner {
+    width: 24px; height: 24px; border: 3px solid rgba(0,217,255,0.2);
+    border-top-color: var(--ts-accent-cyan); border-radius: 50%;
+    animation: ts-spin 0.8s linear infinite;
+}
+@keyframes ts-spin { to { transform: rotate(360deg); } }
+
+.ts-alert { padding: 16px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; display: block; margin-bottom: 1rem; }
+.ts-alert-err { background: var(--ts-error-bg); color: var(--ts-error-text); border: 1px solid var(--ts-error-border); }
+.ts-alert-warn { background: rgba(234,179,8,0.1); color: #facc15; border: 1px solid rgba(234,179,8,0.3); }
+.ts-alert-info { background: rgba(0, 217, 255, 0.08); color: var(--ts-accent-cyan); border: 1px solid rgba(0,217,255,0.25); }
+
+.ts-login-link { display: inline-block; margin-top: 10px; padding: 8px 20px; background: var(--ts-accent-cyan); color: #0a0e27; border-radius: 7px; font-size: 13px; font-weight: 700; text-decoration: none; }
+.ts-recharge-link { display: inline-block; margin-top: 10px; padding: 8px 20px; background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple)); color: #fff; border-radius: 7px; font-size: 13px; font-weight: 700; text-decoration: none; }
+.ts-diag-pre { font-family: 'Fira Mono', monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all; color: var(--ts-error-text); margin: 0; max-height: 340px; overflow-y: auto; }
+
+/* ============================================================
+   SEGMENT 3 / 8 — CONTROL PANEL STYLES
+   (Premium pill-style segmented tabs replacing dropdowns.)
+   ============================================================ */
+.ts-control-panel {
+    background: var(--ts-card-bg); border: 1px solid var(--ts-card-border);
+    border-radius: 14px; padding: 1.25rem; margin-bottom: 1.75rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.ts-mode-tabs {
+    display: flex; gap: 6px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 5px; margin-bottom: 12px;
+}
+.ts-mode-tab {
+    flex: 1; padding: 10px 16px; border: none; border-radius: 7px; background: transparent;
+    color: var(--ts-text-muted); font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s ease;
+}
+.ts-mode-tab:hover:not(.ts-mode-tab-active) { color: var(--ts-text-primary); }
+.ts-mode-tab-active { background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple)); color: #fff; box-shadow: 0 4px 14px rgba(0,217,255,0.25); }
+
+.ts-input-row { display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 768px) { .ts-input-row { flex-direction: row; align-items: stretch; } }
+
+.ts-input, .ts-select {
+    flex: 1; padding: 16px 20px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px;
+    font-size: 15px; background: rgba(0, 0, 0, 0.4); color: var(--ts-text-primary); outline: none; transition: all 0.3s ease; width: 100%;
+}
+.ts-select {
+    appearance: none; -webkit-appearance: none; cursor: pointer; max-width: 180px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2300d9ff'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 16px center; padding-right: 36px;
+}
+.ts-input:focus, .ts-select:focus { border-color: var(--ts-accent-cyan); box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.15); }
+
+.ts-btn {
+    padding: 16px 32px; background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple));
+    color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: transform 0.2s ease, opacity 0.2s ease; white-space: nowrap;
+}
+.ts-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.ts-btn:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.9; }
+.ts-btn-secondary { background: rgba(255,255,255,0.06); color: var(--ts-text-primary); border: 1px solid rgba(255,255,255,0.15); width: 100%; margin-top: 15px; }
+.ts-btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: var(--ts-accent-cyan); }
+
+/* ============================================================
+   SEGMENT 4 / 8 — DASHBOARD DATA CARD STYLES
+   ============================================================ */
+.ts-card {
+    background: var(--ts-card-bg); border: 1px solid var(--ts-card-border);
+    border-radius: 12px; padding: 1.5rem; width: 100%; margin-bottom: 1.25rem;
+}
+.ts-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.ts-card-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--ts-accent-purple); letter-spacing: 1.5px; margin: 0; }
+
+.ts-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.ts-stat-block { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 1rem 0.5rem; text-align: center; }
+.ts-stat-val { font-size: 1.25rem; font-weight: 800; color: #fff; display: block; margin-bottom: 0.2rem; }
+.ts-stat-lbl { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--ts-text-muted); letter-spacing: 1px; }
+
+.ts-video-list { display: flex; flex-direction: column; gap: 10px; }
+.ts-video-card {
+    display: flex; gap: 12px; align-items: center; background: rgba(0,0,0,0.2);
+    border: 1px solid var(--ts-card-border); border-radius: 10px; padding: 10px;
+    text-decoration: none; color: inherit; transition: border-color 0.2s ease;
+}
+.ts-video-card:hover { border-color: rgba(0,217,255,0.35); }
+.ts-video-thumb { width: 120px; min-width: 120px; aspect-ratio: 16/9; border-radius: 6px; overflow: hidden; background: #000; }
+.ts-video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ts-video-info { flex: 1; min-width: 0; }
+.ts-video-title { font-size: 0.92rem; font-weight: 600; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+.ts-video-meta { font-size: 0.75rem; color: var(--ts-text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.ts-video-views { font-weight: 700; color: var(--ts-accent-cyan); }
+
+/* ============================================================
+   SEGMENT 5 / 8 — TIMELINE TOGGLE & COMPARISON DASHBOARD
+   ============================================================ */
+.ts-timeline-row { display: flex; gap: 10px; margin-bottom: 1rem; }
+.ts-toggle-btn {
+    flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--ts-card-border);
+    color: var(--ts-text-muted); transition: all 0.2s ease;
+}
+.ts-toggle-btn.ts-toggle-active { background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple)); color: #fff; border-color: transparent; }
+.ts-toggle-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ts-cache-flag { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--ts-text-muted); letter-spacing: 0.5px; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 5px; }
+.ts-cache-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block; }
+.ts-snapshot-date { font-size: 0.8rem; color: var(--ts-text-muted); margin-bottom: 1rem; }
+
+.ts-delta-row { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.ts-delta-row:last-child { border-bottom: none; }
+.ts-delta-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+/* Applied clamping strictly for long video titles in comparison view */
+.ts-delta-label { font-size: 0.85rem; color: var(--ts-text-muted); font-weight: 600; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; max-width:55%; }
+.ts-delta-vals { font-size: 0.85rem; color: #fff; font-weight: 700; }
+.ts-delta-pct { font-size: 0.85rem; font-weight: 800; margin-left: 8px; }
+.ts-delta-up { color: var(--ts-success-text); }
+.ts-delta-down { color: var(--ts-error-text); }
+.ts-delta-flat { color: var(--ts-text-muted); }
+.ts-delta-bar-track { width: 100%; height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+.ts-delta-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.ts-delta-bar-up { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.ts-delta-bar-down { background: linear-gradient(90deg, #f87171, #dc2626); }
+.ts-delta-bar-flat { background: rgba(255,255,255,0.15); }
+</style>
+
+<div class="ts-master-wrapper">
+  <div class="ts-hero">
+      <h1>Channel <span style="color: #00d9ff;">Analysis</span></h1>
+      <p>Analyze specific competitor channels, track their views growth, and filter performance data by custom dates instantly.</p>
+  </div>
+
+  <div class="ts-container">
+    <div class="ts-control-panel">
+      <div class="ts-mode-tabs" role="tablist" aria-label="Analysis mode">
+        <button type="button" class="ts-mode-tab ts-mode-tab-active" data-mode="analyze" role="tab" aria-selected="true" onclick="caiSetMode('analyze')">Analyze</button>
+        <button type="button" class="ts-mode-tab" data-mode="compare" role="tab" aria-selected="false" onclick="caiSetMode('compare')">Compare</button>
+      </div>
+      <div class="ts-input-row">
+        <input type="url" id="cai-url" class="ts-input" placeholder="https://www.youtube.com/@channelhandle" spellcheck="false" autocomplete="off" aria-label="YouTube Channel URL" />
+        
+        <label for="cai-days" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">Select date range</label>
+        
+                <select id="cai-days" class="ts-select" aria-label="Select date range for channel analysis">
+          <option value="7">Last 7 days</option>
+          <option value="14">Last 14 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="60">Last 60 days</option>
+        </select>
+        <button id="cai-btn" class="ts-btn" onclick="caiHandlePrimaryAction()">Analyze</button>
+      </div>
+    </div>
+    <div id="cai-out" class="ts-output"></div>
+  </div>
+</div>
+<script>
+(function() {
+
+  // ============================================================
+  // SEGMENT 7 / 8 — CORE STATE, HELPERS & RENDER FUNCTIONS
+  // (Memory cache logic for instant flipping between tabs/states)
+  // ============================================================
+
+  const DEBUG_MODE = false;
+  const API_ENDPOINT = 'https://www.techstora.com/api/v1/youtube/proxy';
+  const BEFORE_ENDPOINT = 'https://www.techstora.com/api/v1/youtube/before';
+  const COMPARE_ENDPOINT = 'https://www.techstora.com/api/v1/youtube/compare';
+  const RECHARGE_URL = 'https://www.techstora.com/my-wallet';
+
+  let currentUrl = null;
+  let activeView = 'after';
+  let currentMode = 'analyze';
+  let visibleVideos = 10;
+
+  let afterCache = null;    
+  let beforeCache = null;   
+  let compareCache = null;
+  let cachedForUrl = null;  
+
+  function getUID() {
+    try {
+      const scripts = document.getElementsByTagName('script');
+      for (let s of scripts) {
+        const t = s.innerHTML || s.textContent || '';
+        if (t.includes('__session_info__') && t.includes('"uid"')) {
+          const m = t.match(/"uid"\s*:\s*(\d+)/);
+          if (m && m[1]) return m[1];
+        }
+      }
+    } catch(e) {}
+    return 'unknown_uid';
+  }
+
+  function fmtNum(n) {
+    if (n == null) return '—';
+    const x = Number(n);
+    if (x >= 1e9) return (x / 1e9).toFixed(1) + 'B';
+    if (x >= 1e6) return (x / 1e6).toFixed(1) + 'M';
+    if (x >= 1e3) return (x / 1e3).toFixed(1) + 'K';
+    return x.toLocaleString();
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    try { return new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch(e) { return ''; }
+  }
+
+  function setOut(html) {
+    document.getElementById('cai-out').innerHTML = html;
+  }
+
+  function setBtn(loading, label) {
+    const b = document.getElementById('cai-btn');
+    if(b) {
+        b.disabled = loading;
+        b.textContent = loading ? 'Working...' : (label || 'Analyze');
+    }
+  }
+
+  function currentModeLabel() {
+    return currentMode === 'compare' ? 'Compare' : 'Analyze';
+  }
+
+  // Exposed globally for DOM invocation
+  window.caiSetMode = function(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.ts-mode-tab').forEach(btn => {
+      const isActive = btn.dataset.mode === mode;
+      btn.classList.toggle('ts-mode-tab-active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    const b = document.getElementById('cai-btn');
+    if (b && !b.disabled) b.textContent = currentModeLabel();
+    
+    // Serve from memory instantly if switching tabs on the same URL
+    if (cachedForUrl === document.getElementById('cai-url').value.trim()) {
+        if (currentMode === 'analyze' && afterCache) {
+            setOut(`
+              <div class="ts-workspace">
+                ${renderTimelineRow()}
+                <div id="cai-panel">${cacheFlagHtml()}${renderChannelCard(afterCache)}</div>
+              </div>
+            `);
+        } else if (currentMode === 'compare' && compareCache) {
+            renderCompareData(compareCache, true);
+        }
+    }
+  };
+
+  // Pagination handler mapping to the globally exposed IIFE namespace
+  window.caiShowMore = function() {
+      visibleVideos += 10;
+      if (activeView === 'after' && afterCache) {
+          document.getElementById('cai-panel').innerHTML = cacheFlagHtml() + renderChannelCard(afterCache);
+      } else if (activeView === 'before' && beforeCache) {
+          document.getElementById('cai-panel').innerHTML = cacheFlagHtml() + `
+            <div class="ts-snapshot-date">📅 Captured: ${fmtDate(beforeCache.captured_at)}</div>
+            ${renderChannelCard(beforeCache.data)}
+          `;
+      }
+  };
+
+  function cacheFlagHtml() {
+    return `<div class="ts-cache-flag"><span class="ts-cache-dot"></span>Loaded instantly from this session (no server call)</div>`;
+  }
+
+  function pctClass(pct) {
+    if (pct == null) return 'ts-delta-flat';
+    if (pct > 0) return 'ts-delta-up';
+    if (pct < 0) return 'ts-delta-down';
+    return 'ts-delta-flat';
+  }
+
+  function pctLabel(pct) {
+    if (pct == null) return '—';
+    const sign = pct > 0 ? '+' : '';
+    return `${sign}${pct}%`;
+  }
+
+  function pctBarWidth(pct) {
+    if (pct == null) return 0;
+    return Math.min(100, Math.abs(pct));
+  }
+
+  function pctBarClass(pct) {
+    if (pct == null) return 'ts-delta-bar-flat';
+    if (pct > 0) return 'ts-delta-bar-up';
+    if (pct < 0) return 'ts-delta-bar-down';
+    return 'ts-delta-bar-flat';
+  }
+
+  function renderTimelineRow() {
+    const afterActive = activeView === 'after' ? 'ts-toggle-active' : '';
+    const beforeActive = activeView === 'before' ? 'ts-toggle-active' : '';
+    return `
+      <div class="ts-timeline-row">
+        <button class="ts-toggle-btn ${afterActive}" onclick="caiShowAfter()">After (Latest)</button>
+        <button class="ts-toggle-btn ${beforeActive}" onclick="caiShowBefore()">Before (Previous Snapshot)</button>
+      </div>
+    `;
+  }
+
+  function renderAuthRequired() {
+    return `<div class="ts-alert ts-alert-warn">Authorization required to access pipeline.</div><a class="ts-login-link" href="/web/login">Log In</a>`;
+  }
+
+  function renderQuotaExhausted(msg) {
+    return `<div class="ts-alert ts-alert-warn">🛑 ${msg}</div><a class="ts-recharge-link" href="${RECHARGE_URL}">Recharge Now</a>`;
+  }
+
+  function renderChannelCard(data) {
+      const items = data.items || data.youtube_raw_json?.items || [];
+      const totalViews = items.reduce((s, v) => s + (Number(v.viewCount) || 0), 0);
+      const avgViews = items.length ? Math.round(totalViews / items.length) : 0;
+      
+      const visibleItems = items.slice(0, visibleVideos);
+      const hasMore = items.length > visibleVideos;
+
+      let html = `
+          <div class="ts-card">
+              <div class="ts-card-header"><div class="ts-card-title">Channel Overview</div></div>
+              <div class="ts-stats-grid">
+                  <div class="ts-stat-block">
+                      <span class="ts-stat-val">${fmtNum(totalViews)}</span>
+                      <span class="ts-stat-lbl">Total Views</span>
+                  </div>
+                  <div class="ts-stat-block">
+                      <span class="ts-stat-val">${fmtNum(avgViews)}</span>
+                      <span class="ts-stat-lbl">Avg. Views</span>
+                  </div>
+                  <div class="ts-stat-block">
+                      <span class="ts-stat-val">${items.length}</span>
+                      <span class="ts-stat-lbl">Videos Tracked</span>
+                  </div>
+              </div>
+          </div>
+          <div class="ts-card">
+              <div class="ts-card-header"><div class="ts-card-title">Indexed Uploads</div></div>
+              <div class="ts-video-list">
+      `;
+
+      if (visibleItems.length === 0) {
+          html += `<div style="text-align:center; color:var(--ts-text-muted); font-size:14px; padding:20px;">No video data extracted.</div>`;
+      } else {
+          visibleItems.forEach(it => {
+              html += `
+                  <a href="https://www.youtube.com/watch?v=${it.videoId}" target="_blank" class="ts-video-card">
+                      <div class="ts-video-thumb"><img src="https://i.ytimg.com/vi/${it.videoId}/mqdefault.jpg" loading="lazy" /></div>
+                      <div class="ts-video-info">
+                          <div class="ts-video-title">${it.title || 'Untitled'}</div>
+                          <div class="ts-video-meta"><span class="ts-video-views">${fmtNum(it.viewCount)} views</span></div>
+                      </div>
+                  </a>
+              `;
+          });
+      }
+      html += `</div>`;
+      
+      if (hasMore) {
+          html += `<button class="ts-btn ts-btn-secondary" onclick="window.caiShowMore()">Show More Videos</button>`;
+      }
+      html += `</div>`;
+      return html;
+  }
+
+  // Correctly mapping backend delta array for channel_archive strategy
+  function renderCompareData(data, isCached) {
+      const cacheHtml = isCached ? cacheFlagHtml() : '';
+      let html = `${cacheHtml}<div class="ts-card"><div class="ts-card-header"><div class="ts-card-title">Growth Delta Analysis ${data.days_between ? `(${data.days_between} Days)` : ''}</div></div>`;
+      
+      // Based on delta_calculator.js -> returns an array under comparison_type: 'channel_archive'
+      const items = data.comparison?.items || data.compare_data?.items || data.items;
+
+      if (!items || !Array.isArray(items) || items.length === 0) {
+          html += `<div style="color:var(--ts-text-muted); font-size:14px; padding-bottom:10px;">No comparison items mapped by server.</div></div>`;
+          setOut(html);
+          return;
+      }
+
+      const rows = items.map(m => {
+          const label = m.title || m.videoId || 'Unknown Resource';
+          const pct = m.percent_change;
+          const status = m.status; // new_entry, dropped_out, rank_shifted, stable
+          
+          let valDisplay = '';
+          if (status === 'new_entry') {
+              valDisplay = `New → ${fmtNum(m.viewCount_after)}`;
+          } else if (status === 'dropped_out') {
+              valDisplay = `${fmtNum(m.viewCount_before)} → Dropped`;
+          } else {
+              valDisplay = `${fmtNum(m.viewCount_before)} → ${fmtNum(m.viewCount_after)}`;
+          }
+
+          return `
+            <div class="ts-delta-row">
+              <div class="ts-delta-top">
+                <span class="ts-delta-label" title="${label}">${label}</span>
+                <div>
+                    <span class="ts-delta-vals">${valDisplay}</span>
+                    <span class="ts-delta-pct ${pctClass(pct)}">${pctLabel(pct)}</span>
+                </div>
+              </div>
+              <div class="ts-delta-bar-track"><div class="ts-delta-bar-fill ${pctBarClass(pct)}" style="width:${pctBarWidth(pct)}%"></div></div>
+            </div>
+          `;
+      }).join('');
+
+      html += rows + `</div>`;
+      setOut(html);
+  }
+
+  // ============================================================
+  // SEGMENT 8 / 8 — API HANDLERS (Analyze / Before / Compare)
+  // (Main router orchestrating fetch calls and memory checks)
+  // ============================================================
+
+  window.caiHandlePrimaryAction = function() {
+    if (currentMode === 'compare') {
+      caiRunCompareFlow();
+    } else {
+      caiRun(true); 
+    }
+  };
+
+  window.caiRun = async function(forceRefresh) {
+    const url = document.getElementById('cai-url').value.trim();
+    if (!url) {
+      setOut(`<div class="ts-alert ts-alert-err"><strong>Validation Error:</strong> Enter a valid YouTube URL.</div>`);
+      return;
+    }
+    const days = document.getElementById('cai-days').value;
+
+    if (forceRefresh) {
+      afterCache = null;
+      beforeCache = null;
+      compareCache = null;
+      cachedForUrl = null;
+      visibleVideos = 10;
+    }
+
+    currentUrl = url;
+    activeView = 'after';
+
+    setBtn(true);
+    setOut(`<div class="ts-loading-row"><div class="ts-spinner"></div><span>Querying API Pipeline...</span></div>`);
+
+    const payload = { tool_type: 'channel_archive_indexer', target_url: url, days: days, uid: getUID() };
+
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      const raw = await res.text();
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          let msg = 'Usage limit reached.';
+          try { msg = JSON.parse(raw).error || msg; } catch(e) {}
+          setBtn(false, currentModeLabel());
+          setOut(renderQuotaExhausted(msg));
+          return;
+        }
+        if (res.status === 401) {
+          setBtn(false, currentModeLabel());
+          setOut(renderAuthRequired());
+          return;
+        }
+        throw new Error(`HTTP_${res.status} | ${raw.substring(0, 800)}`);
+      }
+
+      let data;
+      try { data = JSON.parse(raw); } catch(e) { throw new Error(`JSON_PARSE_FAILED | ${raw.substring(0, 800)}`); }
+
+      afterCache = data;
+      cachedForUrl = url;
+
+      setBtn(false, currentModeLabel());
+      setOut(`
+        <div class="ts-workspace">
+          ${renderTimelineRow()}
+          <div id="cai-panel">${renderChannelCard(afterCache)}</div>
+        </div>
+      `);
+
+    } catch(err) {
+      setBtn(false, currentModeLabel());
+      if (DEBUG_MODE) {
+        const dump = JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+        setOut(`<div class="ts-alert ts-alert-err"><strong>RAW FAULT:</strong><hr style="border-color:rgba(200,0,0,0.2);margin:8px 0;"><pre class="ts-diag-pre">${dump}</pre></div>`);
+      } else {
+        setOut(`<div class="ts-alert ts-alert-err">Pipeline compromised. Check server stability and try again.</div>`);
+      }
+    }
+  };
+
+  // Instantly serves Analyze UI if already cached
+  window.caiShowAfter = function() {
+    if (!currentUrl) return;
+    activeView = 'after';
+
+    if (cachedForUrl === currentUrl && afterCache) {
+      const timelineRow = document.querySelector('.ts-timeline-row');
+      const panel = document.getElementById('cai-panel');
+      if (timelineRow) timelineRow.outerHTML = renderTimelineRow();
+      if (panel) {
+        panel.innerHTML = cacheFlagHtml() + renderChannelCard(afterCache);
+      }
+      return; 
+    }
+    caiRun(false);
+  };
+
+  // Fetches historical snapshot logic explicitly for "Before" state
+  window.caiShowBefore = async function() {
+    if (!currentUrl) return;
+    activeView = 'before';
+    const days = document.getElementById('cai-days').value;
+
+    const timelineRow = document.querySelector('.ts-timeline-row');
+    const panel = document.getElementById('cai-panel');
+    if (timelineRow) timelineRow.outerHTML = renderTimelineRow();
+
+    if (cachedForUrl === currentUrl && beforeCache) {
+      if (panel) {
+        panel.innerHTML = cacheFlagHtml() + `
+          <div class="ts-snapshot-date">📅 Captured: ${fmtDate(beforeCache.captured_at)}</div>
+          ${renderChannelCard(beforeCache.data)}
+        `;
+      }
+      return; 
+    }
+
+    if (panel) {
+      panel.innerHTML = `<div class="ts-loading-row"><div class="ts-spinner"></div><span>Fetching previous snapshot...</span></div>`;
+    }
+
+    const payload = { tool_type: 'channel_archive_indexer', target_url: currentUrl, days: days, uid: getUID() };
+
+    try {
+      const res = await fetch(BEFORE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      const raw = await res.text();
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          let msg = 'Usage limit reached.';
+          try { msg = JSON.parse(raw).error || msg; } catch(e) {}
+          document.getElementById('cai-panel').innerHTML = renderQuotaExhausted(msg);
+          return;
+        }
+        if (res.status === 401) {
+          document.getElementById('cai-panel').innerHTML = renderAuthRequired();
+          return;
+        }
+        throw new Error(`HTTP_${res.status} | ${raw.substring(0, 800)}`);
+      }
+
+      let data;
+      try { data = JSON.parse(raw); } catch(e) { throw new Error(`JSON_PARSE_FAILED | ${raw.substring(0, 800)}`); }
+
+      if (data.status === 'not_indexed' || data.status === 'first_index_today') {
+        document.getElementById('cai-panel').innerHTML = `<div class="ts-alert ts-alert-info">${data.message}</div>`;
+        return;
+      }
+
+      beforeCache = { data: data, captured_at: data.captured_at };
+      cachedForUrl = currentUrl;
+
+      document.getElementById('cai-panel').innerHTML = `
+        <div class="ts-snapshot-date">📅 Captured: ${fmtDate(data.captured_at)}</div>
+        ${renderChannelCard(beforeCache.data)}
+      `;
+
+    } catch(err) {
+      const panel = document.getElementById('cai-panel');
+      if (panel) {
+        if (DEBUG_MODE) {
+          const dump = JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+          panel.innerHTML = `<div class="ts-alert ts-alert-err"><strong>RAW FAULT:</strong><hr style="border-color:rgba(200,0,0,0.2);margin:8px 0;"><pre class="ts-diag-pre">${dump}</pre></div>`;
+        } else {
+          panel.innerHTML = `<div class="ts-alert ts-alert-err">Pipeline compromised. Check server stability and try again.</div>`;
+        }
+      }
+    }
+  };
+
+  window.caiRunCompareFlow = async function() {
+    const url = document.getElementById('cai-url').value.trim();
+    if (!url) {
+      setOut(`<div class="ts-alert ts-alert-err"><strong>Validation Error:</strong> Enter a valid YouTube URL.</div>`);
+      return;
+    }
+    const days = document.getElementById('cai-days').value;
+    currentUrl = url;
+
+    // Checks memory prior to querying network to reduce server load
+    if (cachedForUrl === currentUrl && compareCache) {
+      renderCompareData(compareCache, true);
+      return;
+    }
+
+    setBtn(true, 'Compare');
+    setOut(`<div class="ts-loading-row"><div class="ts-spinner"></div><span>Calculating comparison...</span></div>`);
+
+    const payload = { tool_type: 'channel_archive_indexer', target_url: url, days: days, uid: getUID() };
+
+    try {
+      const res = await fetch(COMPARE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      const raw = await res.text();
+
+      if (!res.ok) {
+        if (res.status === 429 || res.status === 402) {
+          let msg = 'Token Balance Depleted.';
+          try { msg = JSON.parse(raw).error || msg; } catch(e) {}
+          setBtn(false, 'Compare');
+          setOut(renderQuotaExhausted(msg));
+          return;
+        }
+        if (res.status === 401) {
+          setBtn(false, 'Compare');
+          setOut(renderAuthRequired());
+          return;
+        }
+        throw new Error(`HTTP_${res.status} | ${raw.substring(0, 800)}`);
+      }
+
+      let data;
+      try { data = JSON.parse(raw); } catch(e) { throw new Error(`JSON_PARSE_FAILED | ${raw.substring(0, 800)}`); }
+
+      setBtn(false, 'Compare');
+
+      if (data.status === 'not_indexed' || data.status === 'first_index_today' || data.status === 'error') {
+        setOut(`<div class="ts-alert ts-alert-info">${data.message || 'Comparison not available yet.'}</div>`);
+        return;
+      }
+
+      compareCache = data;
+      cachedForUrl = url;
+      
+      renderCompareData(compareCache, false);
+
+    } catch(err) {
+      setBtn(false, 'Compare');
+      if (DEBUG_MODE) {
+        const dump = JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+        setOut(`<div class="ts-alert ts-alert-err"><strong>RAW FAULT:</strong><hr style="border-color:rgba(200,0,0,0.2);margin:8px 0;"><pre class="ts-diag-pre">${dump}</pre></div>`);
+      } else {
+        setOut(`<div class="ts-alert ts-alert-err">Pipeline compromised. Check server stability and try again.</div>`);
+      }
+    }
+  };
+
+})();
+</script>
