@@ -1,0 +1,717 @@
+<style>
+    /* ============================================================
+       SEGMENT 1 / 8 — THEME TOKENS & CSS VARIABLES
+       ============================================================ */
+    :root {
+        --ts-bg-main: #0a0e27;
+        --ts-card-bg: rgba(255, 255, 255, 0.03);
+        --ts-card-border: rgba(255, 255, 255, 0.08);
+        --ts-card-hover-border: rgba(0, 217, 255, 0.4);
+        --ts-accent-cyan: #00d9ff;
+        --ts-accent-purple: #8b5cf6;
+        --ts-text-primary: #f5f5f5;
+        --ts-text-muted: #a1a1aa;
+        --ts-error-bg: rgba(220, 38, 38, 0.1);
+        --ts-error-border: rgba(220, 38, 38, 0.3);
+        --ts-error-text: #f87171;
+        --ts-success-text: #4ade80;
+    }
+
+    body { margin: 0; padding: 0; background: var(--ts-bg-main); color: var(--ts-text-primary); font-family: 'Segoe UI', 'Inter', system-ui, sans-serif; }
+
+    /* ============================================================
+       SEGMENT 2 / 8 — LAYOUT & PAGE STRUCTURE STYLES
+       ============================================================ */
+    .ts-master-wrapper { width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; background: var(--ts-bg-main); color: var(--ts-text-primary); font-family: 'Segoe UI', 'Inter', system-ui, sans-serif; box-sizing: border-box; line-height: 1.6; padding-bottom: 4rem; }
+    .ts-master-wrapper * { box-sizing: border-box; }
+    .ts-container { max-width: 1140px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .ts-hero { text-align: center; padding: 3rem 1.5rem 2rem 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); background: radial-gradient(circle at top, rgba(139, 92, 246, 0.1) 0%, transparent 60%); }
+    .ts-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 0 0 0.8rem 0; color: #fff; font-weight: 700; }
+    .ts-hero p { font-size: 1.05rem; color: var(--ts-text-muted); max-width: 680px; margin: 0 auto; }
+
+    /* ============================================================
+       SEGMENT 3 / 8 — INPUT CONTROLLER & TABS
+       ============================================================ */
+    .ts-control-panel { background: var(--ts-card-bg); border: 1px solid var(--ts-card-border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.75rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    
+    .ts-mode-tabs { display: flex; gap: 6px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 5px; margin-bottom: 12px; }
+    .ts-mode-tab { flex: 1; padding: 10px 16px; border: none; border-radius: 7px; background: transparent; color: var(--ts-text-muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s ease; }
+    .ts-mode-tab:hover:not(.ts-mode-tab-active) { color: var(--ts-text-primary); }
+    .ts-mode-tab-active { background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple)); color: #fff; box-shadow: 0 4px 14px rgba(0,217,255,0.25); }
+
+    .ts-input-row { display: flex; flex-direction: column; gap: 12px; }
+    @media (min-width: 768px) { .ts-input-row { flex-direction: row; align-items: stretch; } }
+
+    .ts-input, .ts-select { flex: 1; padding: 16px 20px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; font-size: 15px; background: rgba(0, 0, 0, 0.4); color: var(--ts-text-primary); outline: none; transition: all 0.3s ease; width: 100%; }
+    .ts-select { appearance: none; -webkit-appearance: none; cursor: pointer; max-width: 180px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2300d9ff'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 36px; }
+    .ts-input:focus, .ts-select:focus { border-color: var(--ts-accent-cyan); box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.15); }
+
+    .ts-btn { padding: 16px 32px; background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple)); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease, opacity 0.2s ease; white-space: nowrap; }
+    .ts-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .ts-btn:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.9; }
+
+    /* ============================================================
+       SEGMENT 4 / 8 — PROCESSING MATRIX & ALERTS
+       ============================================================ */
+    .ts-process-matrix { display: none; margin-top: 20px; background: rgba(0, 0, 0, 0.2); padding: 16px; border-radius: 8px; border: 1px dashed rgba(255, 255, 255, 0.1); }
+    .ts-matrix-header { display: flex; justify-content: space-between; font-size: 13px; color: var(--ts-accent-cyan); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    .ts-matrix-track { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; }
+    .ts-matrix-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--ts-accent-cyan), var(--ts-accent-purple)); border-radius: 10px; transition: width 0.1s linear; box-shadow: 0 0 10px rgba(0, 217, 255, 0.5); }
+
+    .ts-alert { padding: 16px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; display: block; margin-bottom: 1rem; }
+    .ts-alert-err { background: var(--ts-error-bg); color: var(--ts-error-text); border: 1px solid var(--ts-error-border); }
+    .ts-alert-warn { background: rgba(234,179,8,0.1); color: #facc15; border: 1px solid rgba(234,179,8,0.3); }
+    .ts-alert-info { background: rgba(0, 217, 255, 0.05); border: 1px solid rgba(0, 217, 255, 0.2); color: var(--ts-accent-cyan); }
+    
+    .ts-recharge-btn { display: inline-block; margin-top: 12px; padding: 10px 24px; background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple)); color: #fff; border-radius: 7px; font-size: 13px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; transition: transform 0.2s ease; }
+    .ts-recharge-btn:hover { transform: translateY(-2px); }
+    
+    .ts-loading-row { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 2rem; font-size: 15px; color: var(--ts-accent-cyan); background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed rgba(0,217,255,0.3); }
+    .ts-spinner { width: 24px; height: 24px; border: 3px solid rgba(0,217,255,0.2); border-top-color: var(--ts-accent-cyan); border-radius: 50%; animation: ts-spin 0.8s linear infinite; }
+    @keyframes ts-spin { to { transform: rotate(360deg); } }
+
+    /* ============================================================
+       SEGMENT 5 / 8 — WORKSPACE, TIMELINE & DELTA BARS
+       ============================================================ */
+    .ts-workspace { display: none; flex-direction: column; gap: 1.5rem; }
+    .ts-card { background: var(--ts-card-bg); border: 1px solid var(--ts-card-border); border-radius: 12px; padding: 1.5rem; width: 100%; margin-bottom: 1.25rem; }
+    .ts-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px; }
+    .ts-card-title { font-size: 0.95rem; font-weight: 700; text-transform: uppercase; color: var(--ts-accent-purple); letter-spacing: 1.5px; margin: 0; }
+
+    .ts-timeline-row { display: flex; gap: 10px; margin-bottom: 1rem; }
+    .ts-toggle-btn { flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; background: rgba(255,255,255,0.04); border: 1px solid var(--ts-card-border); color: var(--ts-text-muted); transition: all 0.2s ease; }
+    .ts-toggle-btn.ts-toggle-active { background: linear-gradient(135deg, var(--ts-accent-cyan), var(--ts-accent-purple)); color: #fff; border-color: transparent; }
+    .ts-cache-flag { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--ts-text-muted); letter-spacing: 0.5px; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 5px; }
+    .ts-cache-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block; }
+    .ts-snapshot-date { font-size: 0.8rem; color: var(--ts-text-muted); margin-bottom: 1rem; }
+
+    /* Compare Delta Styles */
+    .ts-delta-row { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .ts-delta-row:last-child { border-bottom: none; }
+    .ts-delta-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .ts-delta-label { font-size: 0.85rem; color: var(--ts-text-muted); font-weight: 600; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; max-width:55%; }
+    .ts-delta-vals { font-size: 0.85rem; color: #fff; font-weight: 700; }
+    .ts-delta-pct { font-size: 0.85rem; font-weight: 800; margin-left: 8px; }
+    .ts-delta-up { color: var(--ts-success-text); }
+    .ts-delta-down { color: var(--ts-error-text); }
+    .ts-delta-flat { color: var(--ts-text-muted); }
+    .ts-delta-bar-track { width: 100%; height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+    .ts-delta-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+    .ts-delta-bar-up { background: linear-gradient(90deg, #22c55e, #4ade80); }
+    .ts-delta-bar-down { background: linear-gradient(90deg, #f87171, #dc2626); }
+    .ts-delta-bar-flat { background: rgba(255,255,255,0.15); }
+
+    /* ============================================================
+       SEGMENT 6 / 8 — PLAYLIST SPECIFIC UI (TABLES, SORTS, EXPORT)
+       ============================================================ */
+    .ts-action-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .ts-btn-copy { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--ts-text-primary); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .ts-btn-copy:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+    .ts-btn-primary { background: var(--ts-accent-cyan); color: #0a0e27; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.5px; }
+    .ts-btn-primary:hover { background: #00bce6; transform: translateY(-1px); }
+    .ts-btn-secondary { background: rgba(255,255,255,0.06); color: var(--ts-text-primary); border: 1px solid rgba(255,255,255,0.15); width: 100%; margin-top: 15px; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;}
+    .ts-btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--ts-accent-cyan); }
+
+    .ts-sort-select { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); color: var(--ts-text-primary); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; outline: none; }
+    
+    .ts-pl-overview { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .ts-pl-thumb { width: 160px; aspect-ratio: 16/9; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); object-fit: cover; background: #000; }
+    .ts-pl-stats { display: flex; flex-direction: column; gap: 5px; }
+    .ts-pl-stat-num { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1; }
+    .ts-pl-stat-lbl { font-size: 0.8rem; font-weight: 600; color: var(--ts-text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    .ts-table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--ts-card-border); background: rgba(0,0,0,0.2); }
+    .ts-table-wrap::-webkit-scrollbar { height: 6px; }
+    .ts-table-wrap::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    .ts-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+    table.ts-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+    table.ts-table th { padding: 12px 16px; background: rgba(255,255,255,0.03); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ts-text-muted); white-space: nowrap; border-bottom: 1px solid var(--ts-card-border); }
+    table.ts-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
+    table.ts-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .ts-td-thumb img { width: 80px; aspect-ratio: 16/9; border-radius: 4px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+    .ts-td-title { max-width: 250px; font-weight: 600; line-height: 1.4; }
+    .ts-td-title a { color: #fff; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.2s; }
+    .ts-td-title a:hover { color: var(--ts-accent-cyan); }
+    .ts-td-id { font-family: 'Fira Mono', monospace; font-size: 12px; color: var(--ts-accent-purple); font-weight: 600; }
+    .ts-td-date { white-space: nowrap; color: var(--ts-text-muted); font-size: 13px; }
+    .ts-td-views { font-weight: 700; text-align: right; white-space: nowrap; color: #fff; }
+    .ts-copy-icon { cursor: pointer; opacity: 0.6; margin-left: 6px; transition: opacity 0.2s; }
+    .ts-copy-icon:hover { opacity: 1; color: var(--ts-accent-cyan); }
+</style>
+
+<div class="ts-master-wrapper">
+  <div class="ts-hero">
+      <h1>Playlist <span style="color: #00d9ff;">Analyze</span></h1>
+      <p>Analyze specific competitor playlists, track their series views growth, and extract internal playlist performance data instantly.</p>
+  </div>
+
+  <div class="ts-container">
+    <div id="plm-sys-alert"></div>
+
+    <div class="ts-control-panel">
+      <div class="ts-mode-tabs" role="tablist">
+        <button type="button" class="ts-mode-tab ts-mode-tab-active" data-mode="analyze" onclick="window.plmSetMode('analyze')">Analyze</button>
+        <button type="button" class="ts-mode-tab" data-mode="compare" onclick="window.plmSetMode('compare')">Compare</button>
+      </div>
+      <div class="ts-input-row">
+        <input type="url" id="plm-url" class="ts-input" placeholder="https://www.youtube.com/playlist?list=..." spellcheck="false" autocomplete="off" />
+        <select id="plm-days" class="ts-select">
+          <option value="7">Last 7 days</option>
+          <option value="14">Last 14 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="60">Last 60 days</option>
+        </select>
+        <button id="plm-btn" class="ts-btn" onclick="window.plmHandlePrimaryAction()">Analyze</button>
+      </div>
+
+      <div id="plm-operation-matrix" class="ts-process-matrix">
+          <div class="ts-matrix-header">
+              <span id="plm-matrix-status">Establishing Secure Tunnel...</span>
+              <span id="plm-matrix-percent">0%</span>
+          </div>
+          <div class="ts-matrix-track">
+              <div id="plm-matrix-fill" class="ts-matrix-fill"></div>
+          </div>
+      </div>
+    </div>
+
+    <div id="plm-out" class="ts-workspace"></div>
+  </div>
+</div>
+
+<script type="text/javascript">
+(function() {
+  // ============================================================
+  // SEGMENT 8 / 8 — CORE LOGIC & API HANDLERS
+  // (Window scoping, caching, before/after, compare, tables)
+  // ============================================================
+
+  const API_ENDPOINT = 'https://www.techstora.com/api/v1/youtube/proxy';
+  const BEFORE_ENDPOINT = 'https://www.techstora.com/api/v1/youtube/before';
+  const COMPARE_ENDPOINT = 'https://www.techstora.com/api/v1/youtube/compare';
+  const RECHARGE_URL = 'https://www.techstora.com/my-wallet';
+  
+  // Scoped memory states
+  window._plmState = {
+      mode: 'analyze',
+      activeView: 'after',
+      currentUrl: null,
+      visibleCount: 10,
+      currentSort: 'default'
+  };
+
+  window._plmCache = {
+      after: null,
+      before: null,
+      compare: null,
+      cachedForUrl: null
+  };
+
+  /* Secure Session Ingestion Loop */
+  function getUID() {
+    try {
+      const scripts = window.document.getElementsByTagName('script');
+      for (let s of scripts) {
+        const t = s.innerHTML || s.textContent || '';
+        if (t.includes('__session_info__') && t.includes('"uid"')) {
+          const m = t.match(/"uid"\s*:\s*(\d+)/);
+          if (m && m[1]) return m[1];
+        }
+      }
+    } catch(e) {}
+    return 'unknown_uid';
+  }
+
+  function fmtNum(n) {
+    if (n == null) return '—';
+    const x = Number(n);
+    if (x >= 1e9) return (x / 1e9).toFixed(1) + 'B';
+    if (x >= 1e6) return (x / 1e6).toFixed(1) + 'M';
+    if (x >= 1e3) return (x / 1e3).toFixed(1) + 'K';
+    return x.toLocaleString();
+  }
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); }
+    catch(e) { return d; }
+  }
+
+  function triggerSystemAlert(typeClass, htmlMessage) {
+      const alertNode = document.getElementById('plm-sys-alert');
+      if (!htmlMessage) { alertNode.style.display = 'none'; return; }
+      alertNode.className = `ts-alert ${typeClass}`;
+      alertNode.innerHTML = htmlMessage;
+      alertNode.style.display = 'block';
+  }
+
+  function setOut(html) {
+      const outNode = document.getElementById('plm-out');
+      outNode.innerHTML = html;
+      outNode.style.display = 'flex';
+  }
+
+  function setBtn(loading, label) {
+      const b = document.getElementById('plm-btn');
+      if(b) {
+          b.disabled = loading;
+          b.textContent = loading ? 'Working...' : (label || 'Map Playlist');
+      }
+  }
+
+  // Strictly conditional wallet redirect
+  window.plmRedirectWallet = function() { window.location.href = RECHARGE_URL; };
+
+  function enforceProcessingDelay(targetDurationMS, updateCallback) {
+      return new Promise((resolve) => {
+          const startTime = Date.now();
+          const timerSequence = setInterval(() => {
+              const elapsedTime = Date.now() - startTime;
+              const ratio = Math.min(elapsedTime / targetDurationMS, 1);
+              updateCallback(ratio);
+              if (ratio >= 1) { clearInterval(timerSequence); resolve(); }
+          }, 80);
+      });
+  }
+
+  // Mode and Timeline Logic
+  window.plmSetMode = function(mode) {
+      window._plmState.mode = mode;
+      document.querySelectorAll('.ts-mode-tab').forEach(btn => {
+          btn.classList.toggle('ts-mode-tab-active', btn.dataset.mode === mode);
+      });
+      const btnLabel = mode === 'compare' ? 'Compare' : 'Map Playlist';
+      setBtn(false, btnLabel);
+      
+      const currentUrlInput = document.getElementById('plm-url').value.trim();
+      if (window._plmCache.cachedForUrl === currentUrlInput) {
+          if (mode === 'analyze' && window._plmCache.after) {
+              setOut(`
+                ${renderTimelineRow()}
+                <div id="plm-panel">${cacheFlagHtml()}${renderDarkEcosystemLayout(window._plmCache.after)}</div>
+              `);
+          } else if (mode === 'compare' && window._plmCache.compare) {
+              renderCompareData(window._plmCache.compare, true);
+          }
+      }
+  };
+
+  function cacheFlagHtml() {
+      return `<div class="ts-cache-flag"><span class="ts-cache-dot"></span>Loaded instantly from this session</div>`;
+  }
+
+  function renderTimelineRow() {
+      const afterActive = window._plmState.activeView === 'after' ? 'ts-toggle-active' : '';
+      const beforeActive = window._plmState.activeView === 'before' ? 'ts-toggle-active' : '';
+      return `
+        <div class="ts-timeline-row">
+          <button class="ts-toggle-btn ${afterActive}" onclick="window.plmShowAfter()">After (Latest)</button>
+          <button class="ts-toggle-btn ${beforeActive}" onclick="window.plmShowBefore()">Before (Previous Snapshot)</button>
+        </div>
+      `;
+  }
+
+  // Export & Copy Helpers
+  window._plmExport = function(targetCacheKey) {
+      const cacheObj = targetCacheKey === 'before' ? window._plmCache.before?.data : window._plmCache.after;
+      const items = cacheObj?.items || cacheObj?.youtube_raw_json?.items || [];
+      if (items.length === 0) return;
+
+      const header = ['#', 'Title', 'Video ID', 'Published Date', 'Views'];
+      const rows = items.map((it, i) => [
+          i + 1,
+          `"${(it.title || '').replace(/"/g, '""')}"`,
+          it.videoId || '',
+          it.publishedAt ? new Date(it.publishedAt).toISOString().split('T')[0] : '',
+          it.viewCount != null ? it.viewCount : ''
+      ]);
+      const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `playlist_map_${targetCacheKey || 'latest'}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+  };
+
+  window._plmCopyAllIDs = function(btn, targetCacheKey) {
+      const cacheObj = targetCacheKey === 'before' ? window._plmCache.before?.data : window._plmCache.after;
+      const items = cacheObj?.items || cacheObj?.youtube_raw_json?.items || [];
+      if(items.length === 0) return;
+
+      const ids = items.map(it => it.videoId).filter(Boolean);
+      navigator.clipboard.writeText(ids.join(', ')).then(() => {
+          const og = btn.innerText;
+          btn.innerText = 'Copied!';
+          setTimeout(() => btn.innerText = og, 1500);
+      });
+  };
+
+  window._plmCopyText = function(text, iconNode) {
+      navigator.clipboard.writeText(text).then(() => {
+          iconNode.style.color = '#00d9ff';
+          setTimeout(() => iconNode.style.color = 'inherit', 1500);
+      });
+  };
+
+  // Sorting & Pagination
+  function sortPlaylistItems(items, sortMode) {
+      const copy = [...items];
+      if (sortMode === 'views_desc') copy.sort((a, b) => (Number(b.viewCount) || 0) - (Number(a.viewCount) || 0));
+      else if (sortMode === 'views_asc') copy.sort((a, b) => (Number(a.viewCount) || 0) - (Number(b.viewCount) || 0));
+      return copy;
+  }
+
+  window._plmSortChange = function(sortMode, targetCacheKey) {
+      window._plmState.currentSort = sortMode;
+      window._plmState.visibleCount = 10;
+      
+      const cacheObj = targetCacheKey === 'before' ? window._plmCache.before?.data : window._plmCache.after;
+      const items = cacheObj?.items || cacheObj?.youtube_raw_json?.items || [];
+      const sortedItems = sortPlaylistItems(items, sortMode);
+      
+      const tbody = document.getElementById('plm-table-body');
+      const loadMoreBtn = document.getElementById('plm-load-more');
+      
+      if (tbody) tbody.innerHTML = buildTableRows(sortedItems.slice(0, window._plmState.visibleCount));
+      if (loadMoreBtn) loadMoreBtn.style.display = sortedItems.length > window._plmState.visibleCount ? 'block' : 'none';
+  };
+  
+  window.plmShowMore = function(targetCacheKey) {
+      window._plmState.visibleCount += 10;
+      const cacheObj = targetCacheKey === 'before' ? window._plmCache.before?.data : window._plmCache.after;
+      const items = cacheObj?.items || cacheObj?.youtube_raw_json?.items || [];
+      const sortedItems = sortPlaylistItems(items, window._plmState.currentSort);
+      
+      const tbody = document.getElementById('plm-table-body');
+      const loadMoreBtn = document.getElementById('plm-load-more');
+      
+      if (tbody) tbody.innerHTML = buildTableRows(sortedItems.slice(0, window._plmState.visibleCount));
+      if (loadMoreBtn) loadMoreBtn.style.display = sortedItems.length > window._plmState.visibleCount ? 'block' : 'none';
+  };
+
+  function buildTableRows(items) {
+      return items.map((it, i) => `
+        <tr>
+          <td style="opacity:0.4;font-size:12px;">${i + 1}</td>
+          <td class="ts-td-thumb">
+              <img src="https://img.youtube.com/vi/${it.videoId}/mqdefault.jpg" alt="Thumb" loading="lazy" onerror="this.src='https://via.placeholder.com/120x68/0a0e27/00d9ff?text=No+Thumb'">
+          </td>
+          <td class="ts-td-title" title="${(it.title || '').replace(/"/g, '&quot;')}">
+            <a href="https://www.youtube.com/watch?v=${it.videoId}" target="_blank" rel="noopener">${it.title || 'Untitled'}</a>
+          </td>
+          <td class="ts-td-id">
+              ${it.videoId || '—'} 
+              <span class="ts-copy-icon" onclick="window._plmCopyText('${it.videoId}', this)" title="Copy ID">📋</span>
+          </td>
+          <td class="ts-td-date">${fmtDate(it.publishedAt)}</td>
+          <td class="ts-td-views">${fmtNum(it.viewCount)}</td>
+        </tr>`).join('');
+  }
+
+  function renderDarkEcosystemLayout(json, isBeforeState = false) {
+      const items = json.items || json.youtube_raw_json?.items || [];
+      const targetCacheKey = isBeforeState ? 'before' : 'after';
+      
+      const sortedItems = sortPlaylistItems(items, window._plmState.currentSort);
+      const visibleItems = sortedItems.slice(0, window._plmState.visibleCount);
+      const hasMore = items.length > window._plmState.visibleCount;
+      
+      const coverThumb = items.length > 0 ? `https://img.youtube.com/vi/${items[0].videoId}/mqdefault.jpg` : '';
+      const truncNote = json.truncated ? `<div class="ts-alert ts-alert-info">⚠️ Payload limitation active: Showing the first 200 items.</div>` : '';
+
+      return `
+        <div class="ts-card">
+            <div class="ts-card-header">
+                <div class="ts-card-title">Playlist Architecture Overview</div>
+                <div class="ts-action-group">
+                    <select class="ts-sort-select" onchange="window._plmSortChange(this.value, '${targetCacheKey}')">
+                        <option value="default" ${window._plmState.currentSort === 'default' ? 'selected' : ''}>Original Order</option>
+                        <option value="views_desc" ${window._plmState.currentSort === 'views_desc' ? 'selected' : ''}>Top Performing</option>
+                        <option value="views_asc" ${window._plmState.currentSort === 'views_asc' ? 'selected' : ''}>Lowest Performing</option>
+                    </select>
+                    <button class="ts-btn-copy" onclick="window._plmCopyAllIDs(this, '${targetCacheKey}')">Copy All IDs</button>
+                    <button class="ts-btn-primary" onclick="window._plmExport('${targetCacheKey}')">Export CSV</button>
+                </div>
+            </div>
+            <div class="ts-pl-overview">
+                ${coverThumb ? `<img src="${coverThumb}" class="ts-pl-thumb" alt="Playlist Cover">` : ''}
+                <div class="ts-pl-stats">
+                    <span class="ts-pl-stat-num">${items.length}</span>
+                    <span class="ts-pl-stat-lbl">Total Valid Nodes Extracted</span>
+                </div>
+            </div>
+        </div>
+        <div class="ts-card" style="padding: 0; border: none; background: transparent;">
+            <div class="ts-table-wrap">
+                <table class="ts-table">
+                    <thead>
+                        <tr>
+                            <th style="width:32px;">#</th>
+                            <th style="width:100px;">Node</th>
+                            <th>Identity Title</th>
+                            <th>Secure ID</th>
+                            <th>Published</th>
+                            <th style="text-align:right;">Views</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plm-table-body">${buildTableRows(visibleItems)}</tbody>
+                </table>
+            </div>
+            <button id="plm-load-more" class="ts-btn-secondary" style="display: ${hasMore ? 'block' : 'none'};" onclick="window.plmShowMore('${targetCacheKey}')">Show More Videos</button>
+            ${truncNote}
+        </div>`;
+  }
+
+  // Compare Delta Bar Helpers
+  function pctClass(pct) {
+      if (pct == null) return 'ts-delta-flat';
+      return pct > 0 ? 'ts-delta-up' : (pct < 0 ? 'ts-delta-down' : 'ts-delta-flat');
+  }
+  function pctLabel(pct) { return pct == null ? '—' : `${pct > 0 ? '+' : ''}${pct}%`; }
+  function pctBarWidth(pct) { return Math.min(100, Math.abs(pct || 0)); }
+  function pctBarClass(pct) {
+      if (pct == null) return 'ts-delta-bar-flat';
+      return pct > 0 ? 'ts-delta-bar-up' : (pct < 0 ? 'ts-delta-bar-down' : 'ts-delta-bar-flat');
+  }
+
+  function renderCompareData(data, isCached) {
+      const cacheHtml = isCached ? cacheFlagHtml() : '';
+      let html = `${cacheHtml}<div class="ts-card"><div class="ts-card-header"><div class="ts-card-title">Playlist Growth Delta ${data.days_between ? `(${data.days_between} Days)` : ''}</div></div>`;
+      
+      const items = data.comparison?.items || data.compare_data?.items || data.items;
+
+      if (!items || !Array.isArray(items) || items.length === 0) {
+          html += `<div style="color:var(--ts-text-muted); font-size:14px; padding-bottom:10px;">No comparison items mapped by server.</div></div>`;
+          setOut(html);
+          return;
+      }
+
+      const rows = items.map(m => {
+          const label = m.title || m.videoId || 'Unknown Node';
+          const pct = m.percent_change;
+          const status = m.status; 
+          
+          let valDisplay = '';
+          if (status === 'new_entry') valDisplay = `New → ${fmtNum(m.viewCount_after)}`;
+          else if (status === 'dropped_out') valDisplay = `${fmtNum(m.viewCount_before)} → Dropped`;
+          else valDisplay = `${fmtNum(m.viewCount_before)} → ${fmtNum(m.viewCount_after)}`;
+
+          return `
+            <div class="ts-delta-row">
+              <div class="ts-delta-top">
+                <span class="ts-delta-label" title="${label}">${label}</span>
+                <div>
+                    <span class="ts-delta-vals">${valDisplay}</span>
+                    <span class="ts-delta-pct ${pctClass(pct)}">${pctLabel(pct)}</span>
+                </div>
+              </div>
+              <div class="ts-delta-bar-track"><div class="ts-delta-bar-fill ${pctBarClass(pct)}" style="width:${pctBarWidth(pct)}%"></div></div>
+            </div>
+          `;
+      }).join('');
+
+      html += rows + `</div>`;
+      setOut(html);
+  }
+
+
+  // ============================================================
+  // ROUTING & NETWORK HANDLERS
+  // ============================================================
+
+  window.plmHandlePrimaryAction = function() {
+      if (window._plmState.mode === 'compare') window.plmRunCompareFlow();
+      else window.plmRunAnalyzeFlow(true); 
+  };
+
+  window.plmRunAnalyzeFlow = async function(forceRefresh) {
+      const url = document.getElementById('plm-url').value.trim();
+      triggerSystemAlert(null, null);
+
+      if (!url.includes('youtube.com') && !url.includes('youtu.be') && !url.includes('list=')) {
+          triggerSystemAlert('ts-alert-err', '<strong>Validation Error:</strong> Enter a valid YouTube playlist URL.');
+          return;
+      }
+
+      if (forceRefresh) {
+          window._plmCache.after = null; window._plmCache.before = null; window._plmCache.compare = null;
+          window._plmCache.cachedForUrl = null; window._plmState.visibleCount = 10; window._plmState.currentSort = 'default';
+      }
+
+      window._plmState.currentUrl = url;
+      window._plmState.activeView = 'after';
+
+      setBtn(true, 'Map Playlist');
+      document.getElementById('plm-out').style.display = 'none';
+      const matrixBox = document.getElementById('plm-operation-matrix');
+      matrixBox.style.display = 'block';
+
+      const payload = { tool_type: 'playlist_bulk_mapper', target_url: url, uid: getUID() };
+      let networkPromise = fetch(API_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(payload) });
+
+      await enforceProcessingDelay(5000, (ratio) => {
+          const percentInt = Math.floor(ratio * 100);
+          document.getElementById('plm-matrix-fill').style.width = `${percentInt}%`;
+          document.getElementById('plm-matrix-percent').textContent = `${percentInt}%`;
+          const ms = document.getElementById('plm-matrix-status');
+          if (percentInt < 40) ms.textContent = 'Resolving Target Playlist ID...';
+          else if (percentInt < 80) ms.textContent = 'Extracting Video Nodes...';
+          else ms.textContent = 'Compiling Data Table...';
+      });
+
+      try {
+          const res = await networkPromise;
+          const raw = await res.text();
+
+          if (!res.ok) {
+              if (res.status === 429 || res.status === 402) {
+                  let msg = 'Token Balance Depleted.';
+                  try { msg = JSON.parse(raw).error || msg; } catch(e) {}
+                  triggerSystemAlert('ts-alert-err', `<strong>Token Balance Depleted</strong><br>${msg}<br><button onclick="window.plmRedirectWallet()" class="ts-recharge-btn">Recharge Wallet</button>`);
+                  return;
+              }
+              if (res.status === 401) { triggerSystemAlert('ts-alert-err', `Authorization required. <button onclick="window.location.href='/web/login'" class="ts-recharge-btn">Log In</button>`); return; }
+              throw new Error(`HTTP_${res.status}`);
+          }
+
+          let data;
+          try { data = JSON.parse(raw); } catch(e) { throw new Error('JSON_PARSE_FAILED'); }
+
+          window._plmCache.after = data;
+          window._plmCache.cachedForUrl = url;
+
+          setOut(`
+              ${renderTimelineRow()}
+              <div id="plm-panel">${renderDarkEcosystemLayout(window._plmCache.after, false)}</div>
+          `);
+      } catch(err) {
+          triggerSystemAlert('ts-alert-err', '<strong>System Fault:</strong> API connection failed or pipeline compromised.');
+      } finally {
+          setBtn(false, 'Map Playlist');
+          matrixBox.style.display = 'none';
+          document.getElementById('plm-matrix-fill').style.width = '0%';
+      }
+  };
+
+  window.plmShowAfter = function() {
+      if (!window._plmState.currentUrl) return;
+      window._plmState.activeView = 'after';
+      if (window._plmCache.cachedForUrl === window._plmState.currentUrl && window._plmCache.after) {
+          const tr = document.querySelector('.ts-timeline-row');
+          if (tr) tr.outerHTML = renderTimelineRow();
+          document.getElementById('plm-panel').innerHTML = cacheFlagHtml() + renderDarkEcosystemLayout(window._plmCache.after, false);
+          return;
+      }
+      window.plmRunAnalyzeFlow(false);
+  };
+
+  window.plmShowBefore = async function() {
+      if (!window._plmState.currentUrl) return;
+      window._plmState.activeView = 'before';
+      const days = document.getElementById('plm-days').value;
+
+      const tr = document.querySelector('.ts-timeline-row');
+      const panel = document.getElementById('plm-panel');
+      if (tr) tr.outerHTML = renderTimelineRow();
+
+      if (window._plmCache.cachedForUrl === window._plmState.currentUrl && window._plmCache.before) {
+          if (panel) {
+              panel.innerHTML = cacheFlagHtml() + `<div class="ts-snapshot-date">📅 Captured: ${fmtDate(window._plmCache.before.captured_at)}</div>` + renderDarkEcosystemLayout(window._plmCache.before.data, true);
+          }
+          return;
+      }
+
+      if (panel) panel.innerHTML = `<div class="ts-loading-row"><div class="ts-spinner"></div><span>Fetching previous snapshot...</span></div>`;
+
+      try {
+          const res = await fetch(BEFORE_ENDPOINT, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+              body: JSON.stringify({ tool_type: 'playlist_bulk_mapper', target_url: window._plmState.currentUrl, days: days, uid: getUID() })
+          });
+          const raw = await res.text();
+
+          if (!res.ok) {
+              if (res.status === 429 || res.status === 402) {
+                  let msg = 'Token Balance Depleted.'; try { msg = JSON.parse(raw).error || msg; } catch(e) {}
+                  document.getElementById('plm-panel').innerHTML = `<div class="ts-alert ts-alert-err">${msg}<br><button onclick="window.plmRedirectWallet()" class="ts-recharge-btn">Recharge Wallet</button></div>`;
+                  return;
+              }
+              throw new Error(`HTTP_${res.status}`);
+          }
+
+          const data = JSON.parse(raw);
+          if (data.status === 'not_indexed' || data.status === 'first_index_today') {
+              document.getElementById('plm-panel').innerHTML = `<div class="ts-alert ts-alert-info">${data.message}</div>`;
+              return;
+          }
+
+          window._plmCache.before = { data: data, captured_at: data.captured_at };
+          window._plmCache.cachedForUrl = window._plmState.currentUrl;
+
+          document.getElementById('plm-panel').innerHTML = `
+              <div class="ts-snapshot-date">📅 Captured: ${fmtDate(data.captured_at)}</div>
+              ${renderDarkEcosystemLayout(window._plmCache.before.data, true)}
+          `;
+      } catch(err) {
+          document.getElementById('plm-panel').innerHTML = `<div class="ts-alert ts-alert-err">Pipeline compromised. Check server stability.</div>`;
+      }
+  };
+
+  window.plmRunCompareFlow = async function() {
+      const url = document.getElementById('plm-url').value.trim();
+      triggerSystemAlert(null, null);
+      if (!url.includes('list=')) { triggerSystemAlert('ts-alert-err', 'Enter a valid YouTube playlist URL.'); return; }
+      
+      const days = document.getElementById('plm-days').value;
+      window._plmState.currentUrl = url;
+
+      if (window._plmCache.cachedForUrl === url && window._plmCache.compare) {
+          renderCompareData(window._plmCache.compare, true);
+          return;
+      }
+
+      setBtn(true, 'Compare');
+      document.getElementById('plm-out').innerHTML = `<div class="ts-loading-row"><div class="ts-spinner"></div><span>Calculating playlist comparison...</span></div>`;
+      document.getElementById('plm-out').style.display = 'flex';
+
+      try {
+          const res = await fetch(COMPARE_ENDPOINT, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+              body: JSON.stringify({ tool_type: 'playlist_bulk_mapper', target_url: url, days: days, uid: getUID() })
+          });
+          const raw = await res.text();
+
+          if (!res.ok) {
+              if (res.status === 429 || res.status === 402) {
+                  let msg = 'Token Balance Depleted.'; try { msg = JSON.parse(raw).error || msg; } catch(e) {}
+                  triggerSystemAlert('ts-alert-err', `<strong>Token Balance Depleted</strong><br>${msg}<br><button onclick="window.plmRedirectWallet()" class="ts-recharge-btn">Recharge Wallet</button>`);
+                  document.getElementById('plm-out').style.display = 'none';
+                  return;
+              }
+              throw new Error(`HTTP_${res.status}`);
+          }
+
+          const data = JSON.parse(raw);
+          if (data.status === 'not_indexed' || data.status === 'first_index_today' || data.status === 'error') {
+              setOut(`<div class="ts-alert ts-alert-info">${data.message || 'Comparison not available yet.'}</div>`);
+              return;
+          }
+
+          window._plmCache.compare = data;
+          window._plmCache.cachedForUrl = url;
+          renderCompareData(window._plmCache.compare, false);
+
+      } catch(err) {
+          triggerSystemAlert('ts-alert-err', '<strong>System Fault:</strong> API connection failed or pipeline compromised.');
+          document.getElementById('plm-out').style.display = 'none';
+      } finally {
+          setBtn(false, 'Compare');
+      }
+  };
+
+})();
+</script>
