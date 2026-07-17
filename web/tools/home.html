@@ -1,0 +1,203 @@
+<style>
+    html { scroll-behavior: smooth; }
+    
+    .ts-master-wrapper {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background: #0a0e27;
+        color: #f5f5f5;
+        line-height: 1.6;
+        padding: 0;
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        overflow-x: hidden;
+    }
+    .ts-master-wrapper * {
+        box-sizing: border-box;
+    }
+    .ts-master-wrapper a {
+        text-decoration: none;
+        color: inherit;
+    }
+    .ts-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+    }
+    .ts-section-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #00d9ff, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .ts-section-desc {
+        text-align: center;
+        font-size: 1.1rem;
+        color: #a1a1aa;
+        max-width: 800px;
+        margin: 0 auto 3rem auto;
+    }
+    .ts-grid-4 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
+    .ts-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 2rem;
+        transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .ts-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(0, 217, 255, 0.4);
+        background: rgba(255, 255, 255, 0.06);
+    }
+    .ts-hero {
+        text-align: center;
+        padding: 6rem 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .ts-hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        margin-bottom: 1rem;
+        color: #fff;
+    }
+    .ts-hero p {
+        font-size: 1.2rem;
+        color: #a1a1aa;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .ts-service-stage {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #8b5cf6;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+    .ts-site-name {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+    .ts-site-desc {
+        font-size: 0.95rem;
+        color: #a1a1aa;
+    }
+    .ts-icon-wrapper {
+        margin-bottom: 1.2rem;
+        display: inline-block;
+    }
+    .ts-btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 2.5rem;
+        flex-wrap: wrap;
+    }
+    .ts-btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        display: inline-block;
+    }
+    .ts-btn-agency {
+        background: linear-gradient(135deg, #00d9ff, #8b5cf6);
+        color: #fff;
+        border: none;
+    }
+    .ts-btn-agency:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+    .ts-btn-tools {
+        background: transparent;
+        color: #00d9ff;
+        border: 2px solid #00d9ff;
+    }
+    .ts-btn-tools:hover {
+        background: rgba(0, 217, 255, 0.1);
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="ts-master-wrapper">
+
+    <section class="ts-hero">
+        <h1>We Turn Your YouTube Channel Into a <span style="background: linear-gradient(135deg, #00d9ff, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Managed Business</span></h1>
+        <p>Full-service talent management for creators — editing, distribution, brand deals, and monetization, handled end to end. You focus on filming. We handle the rest.</p>
+        
+        <div class="ts-btn-group">
+            <a href="#agency-form" class="ts-btn ts-btn-agency">Apply to Work With Us</a>
+            <a href="/more-services" class="ts-btn ts-btn-tools">More Services</a>
+        </div>
+    </section>
+
+    <section id="agency-section" class="ts-container">
+        <h2 class="ts-section-title">How We Manage Your Channel</h2>
+        <p class="ts-section-desc">Editing, cross-platform posting, brand deal negotiation, and product launches — we run it like a business so your channel grows even when you're not filming.</p>
+        
+        <div class="ts-grid-4">
+            <div class="ts-card">
+                <div class="ts-icon-wrapper">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00d9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                </div>
+                <div class="ts-service-stage">Stage 01</div>
+                <div class="ts-site-name">Video Editing</div>
+                <div class="ts-site-desc">Professional pacing, captions, and visual style — 4 videos/week per creator, on a fixed turnaround.</div>
+            </div>
+
+            <div class="ts-card">
+                <div class="ts-icon-wrapper">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00d9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                </div>
+                <div class="ts-service-stage">Stage 02</div>
+                <div class="ts-site-name">Channel Management</div>
+                <div class="ts-site-desc">Upload scheduling, thumbnails, titles, and channel strategy — managed daily.</div>
+            </div>
+
+            <div class="ts-card">
+                <div class="ts-icon-wrapper">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00d9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                </div>
+                <div class="ts-service-stage">Stage 03</div>
+                <div class="ts-site-name">Distribution & Reach</div>
+                <div class="ts-site-desc">Repurposed across Instagram, Facebook, and Shorts — 9M additional monthly views on average.</div>
+            </div>
+
+            <div class="ts-card">
+                <div class="ts-icon-wrapper">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00d9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                </div>
+                <div class="ts-service-stage">Stage 04</div>
+                <div class="ts-site-name">Monetization</div>
+                <div class="ts-site-desc">Brand deal negotiation and product launches, so income doesn't depend on ad revenue alone.</div>
+            </div>
+        </div>
+        
+    </section>
+
+    <section id="agency-form" class="ts-container" style="text-align: center;">
+        <h2 class="ts-section-title">Apply to Work With Us</h2>
+        <p class="ts-section-desc">Tell us about your channel. We review every application and reach out to schedule a call.</p>
+        
+        <div style="max-width: 800px; margin: 0 auto;">
+            <div class="ts-odoo-form-wrapper" style="width: 100%; display: inline-block;">
+                </div>
+        </div>
+    </section>
+
+</div>
